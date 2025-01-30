@@ -1,9 +1,6 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-type Props = {};
-
-const Navbar = (props: Props) => {
+const Navbar = () => {
   const location = useLocation();
   return (
     <nav className="bg-white shadow-md">

@@ -73,17 +73,27 @@ import typeDefs from "./src/graphql/schema";
 import { resolvers } from "./src/graphql/resolvers";
 import { initDB } from "./src/common/services/database.service";
 import { config } from "dotenv";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+
 config();
+
 const startServer = async () => {
   await initDB();
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
   const app: Application = express();
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-  });
-  // Apply the GraphQL server middleware to the Express app
+
+
+  const server = new ApolloServer({ schema });
+
   await server.start();
   server.applyMiddleware({ app });
+  // const server = new ApolloServer({
+  //   typeDefs,
+  //   resolvers,
+  // });
+  // Apply the GraphQL server middleware to the Express app
+  // await server.start();
+  // server.applyMiddleware({ app });
   app.listen(4000, () => {
     console.log("Server is running on http://localhost:4000/graphql");
   });

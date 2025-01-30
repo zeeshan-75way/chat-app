@@ -1,5 +1,4 @@
 import { gql } from "apollo-server-express";
-
 const typeDefs = gql`
   type User {
     id: ID!
@@ -13,27 +12,27 @@ const typeDefs = gql`
     forgotPasswordTokenExpiry: String
   }
   type Token {
-  token : String
+    token: String
   }
 
   type Message {
     id: ID!
-    sender: User!
-    receiver: User!
-    content: String
-    media: String
-    status: String!
-    createdAt: String!
+    content: String!
+    sender: String!
   }
 
   type Query {
     users: [User]
-    messages(sender: ID!, receiver: ID!): [Message]
+    messages: [Message!]!
   }
 
   type Mutation {
     login(email: String!, password: String!): Token
     signup(name: String!, email: String!, password: String!): User
+    sendMessage(content: String!, sender: String!): Message!
+  }
+  type Subscription {
+    newMessage: Message!
   }
 `;
 

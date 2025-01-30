@@ -1,18 +1,20 @@
-
 import * as UserService from "../../users/user.service";
 import * as MessageService from "../../message/message.service";
-
+import { PubSub } from "graphql-subscriptions";
+const messages: any = [];
+const pubsub = new PubSub();
+const MESSAGE_ADDED = "MESSAGE_ADDED";
+interface Message {
+  id: number;
+  content: string;
+  sender: string;
+}
 export const resolvers = {
   Query: {
     users: async () => {
       return await UserService.getAllUsers();
     },
-    messages: async (
-      _: any,
-      { senderId, receiverId }: { senderId: string; receiverId: string }
-    ) => {
-      return await MessageService.getMessages(senderId, receiverId);
-    },
+    messages: () => messages,
   },
 
   Mutation: {
@@ -53,6 +55,21 @@ export const resolvers = {
         user.role
       );
       return { token: token };
+    },
+    sendMessage: (
+      _: any,
+      { content, sender }: { content: string; sender: string }
+    ) => {
+      const message: Message = { id: messages.length + 1, content, sender };
+      messages.push(message);
+      pubsub.publish(MESSAGE_ADDED, { newMessage: message });
+      return message;
+    },
+  },
+
+  Subscription: {
+    newMessage: {
+      subscribe: () => pubsub.subscribe("NEW_MESSAGE", (message) => message),
     },
   },
 };
